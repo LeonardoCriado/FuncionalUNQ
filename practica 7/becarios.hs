@@ -1,5 +1,6 @@
 type Nombre = String
 data Planilla = Fin | Registro Nombre Planilla 
+                deriving Show
 
 data Equipo = Becario Nombre
             | Investigador Nombre Equipo Equipo Equipo
@@ -126,6 +127,9 @@ planillaDeIntegrantes (Investigador n e1 e2 e3) =
             planillaDeIntegrantes e3)
 
 -- Tarea:
+becariosNivelN :: Int -> Equipo -> Planilla
+becariosNivelN = planillaDebecariosNivelN
+
 planillaDebecariosNivelN :: Int -> Equipo -> Planilla
 planillaDebecariosNivelN l (Becario n)               = if (l == 0) then Registro n Fin else Fin
 planillaDebecariosNivelN l (Investigador n e1 e2 e3) = if (l == 0) 
@@ -138,6 +142,8 @@ planillaDebecariosNivelN l (Investigador n e1 e2 e3) = if (l == 0)
                                                            planillaDebecariosNivelN (l-1) e3)
 
 
---todosSeLlaman :: Nombre -> Planilla -> Bool
---todosSeLlaman s Fin = True
---todosSeLlaman s (Registro n p) = (s == n) && todosSeLlaman s pd
+todosSeLlaman :: Nombre -> Planilla -> Bool
+todosSeLlaman s Fin = True
+todosSeLlaman s (Registro n p) = (s == n) && todosSeLlaman s p
+
+

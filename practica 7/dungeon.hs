@@ -1,11 +1,10 @@
 import Prelude hiding (maybe)
 
-data Dungeon a =
-    Habitacion a
-  | Pasaje (Maybe a) (Dungeon a)
-  | Bifurcacion (Maybe a) 
-                (Dungeon a)
-                (Dungeon a)
+data Dungeon a =  Habitacion a
+                  | Pasaje (Maybe a) (Dungeon a)
+                  | Bifurcacion (Maybe a) 
+                                 (Dungeon a)
+                                 (Dungeon a)
 
 -- Sea A un conjunto, el conjunto Dungeon A
 -- está formado por las siguientes reglas
@@ -105,9 +104,13 @@ cumpleM p = maybe False p
 boolToInt True  = 1
 boolToInt False = 0
 
+intToBool 1 = True
+intToBool 0 = False
+
 unoSiJust' = maybe_ 0 1
 unoSiNothing' = maybe_ 1 0
 unoSiTiene' e = boolToInt . cumpleM (e ==)
+trueSiJust =  intToBool . unoSiJust'
 --------------------------------------------
 
 esLineal :: Dungeon a -> Bool
@@ -125,15 +128,24 @@ tieneSoloBif (Bifurcacion mx di dd) =
 	esLineal di && esLineal dd
 
 data Dir = L | S | R
-
 data Path = End | D Dir Path
 
 -- f End = ...
 -- f (D d p) = ... f p
 
 -- Tarea:
+-- retorna true si hay algo al final del path
 esInteresanteEn :: Path -> Dungeon a -> Bool
-esInteresanteEn = undefined
+esInteresanteEn p        (Habitacion x)         = True
+esInteresanteEn End      (Pasaje mx d)          = trueSiJust mx
+esInteresanteEn End      (Bifurcacion mx di dd) = trueSiJust mx
+esInteresanteEn (D di p) (Pasaje mx d)          = case di of
+                                                   S -> esInteresanteEn p d
+                                                   _ -> esInteresanteEn p (Pasaje mx d)
+esInteresanteEn (D di p) (Bifurcacion mx dl dr) = case di of
+                                                   L -> esInteresanteEn p dl
+                                                   R -> esInteresanteEn p dr
+                                                   _ -> esInteresanteEn p (Bifurcacion mx dl dr)
 
 llenoDe :: Eq a => a -> Dungeon a -> Bool
 llenoDe e (Habitacion x) = e == x
@@ -147,4 +159,8 @@ llenoDe e (Bifurcacion mx di dd) =
 -- Desafío/Tarea:
 -- replaces the elements of the dungeon
 -- with the path to each element
--- replaceWithPaths :: Dungeon a -> Dungeon Path
+--replaceWithPaths :: Dungeon a -> Dungeon Path
+--replaceWithPaths (Habitacion x) = ...
+--replaceWithPaths (Pasaje mx d) = ... replaceWithPaths d
+--replaceWithPaths (Bifurcacion mx di dd) = ... replaceWithPaths di
+--                                        	... replaceWithPaths dd
