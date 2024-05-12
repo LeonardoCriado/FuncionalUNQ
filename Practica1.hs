@@ -40,6 +40,18 @@ doble (doble 2)
 (doble 2) + (doble 2)
 
 (2+2) + (2+2)
+
+4 + 4
+
+8
+
+doble ( 2 + 2)
+
+doble (4)
+
+4 + 4
+
+8
 -}
 
 {-
@@ -133,7 +145,7 @@ atómica.
 
 Ejercicio 7) Realizar la reducción completa de ((twice twice) doble) 3.
 
-((twice twice) doble) 3         (def twice, siendo f←twice doble)
+((twice twice) doble) 3         
 →                               (def twice, siendo f←twice)
 (g doble) 3                     (donde g x = twice (twice x))
 →                               (def g, donde x←doble)
