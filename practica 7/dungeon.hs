@@ -162,22 +162,23 @@ llenoDe e (Bifurcacion mx di dd) =
 replaceWithPaths :: Dungeon a -> Dungeon Path
 replaceWithPaths (Habitacion x)         = Habitacion  End
 replaceWithPaths (Pasaje mx d)          = Pasaje      (maybe_ Nothing (Just End) mx) 
-                                                      (addPath (D S) (replaceWithPaths d))
+                                                        (addPath (D S) (replaceWithPaths d))
 replaceWithPaths (Bifurcacion mx di dd) = Bifurcacion (maybe_ Nothing (Just End) mx) 
-                                                      (addPath (D L) (replaceWithPaths di))
-                                        	            (addPath (D R) (replaceWithPaths dd))
+                                                        (addPath (D L) (replaceWithPaths di))
+                                        	              (addPath (D R) (replaceWithPaths dd))
 
 addPath :: (Path -> Path) -> Dungeon Path -> Dungeon Path
 addPath p (Habitacion x)         = Habitacion   (p x)
-addPath p (Pasaje mx d)          = Pasaje       (unirMPaths p mx)
-                                                          (addPath (p . (D S)) d)
-addPath p (Bifurcacion mx di dd) = Bifurcacion  (unirMPaths p mx) 
-                                                          (addPath (p . (D L)) di)
-                                        	                (addPath (p . (D R)) dd)
+addPath p (Pasaje mx d)          = Pasaje       (toMPaths p mx)
+                                                   (addPath (p . (D S)) d)
+addPath p (Bifurcacion mx di dd) = Bifurcacion  (toMPaths p mx) 
+                                                   (addPath (p . (D L)) di)
+                                        	         (addPath (p . (D R)) dd)
 
-unirMPaths :: (Path -> Path) -> Maybe Path -> Maybe Path
+toMPaths :: (Path -> Path) -> Maybe Path -> Maybe Path
 unirMPaths fp Nothing   = Nothing 
 unirMPaths fp (Just p2) = Just (fp p2)
+
 
 
 data Dir  = L | S | R
