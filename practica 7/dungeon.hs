@@ -169,15 +169,15 @@ replaceWithPaths (Bifurcacion mx di dd) = Bifurcacion (maybe_ Nothing (Just End)
 
 addPath :: (Path -> Path) -> Dungeon Path -> Dungeon Path
 addPath p (Habitacion x)         = Habitacion   (p x)
-addPath p (Pasaje mx d)          = Pasaje       (toMPaths p mx)
+addPath p (Pasaje mx d)          = Pasaje       (toMaybe p mx)
                                                    (addPath (p . (D S)) d)
-addPath p (Bifurcacion mx di dd) = Bifurcacion  (toMPaths p mx) 
+addPath p (Bifurcacion mx di dd) = Bifurcacion  (toMaybe p mx) 
                                                    (addPath (p . (D L)) di)
                                         	         (addPath (p . (D R)) dd)
 
-toMPaths :: (Path -> Path) -> Maybe Path -> Maybe Path
-unirMPaths fp Nothing   = Nothing 
-unirMPaths fp (Just p2) = Just (fp p2)
+toMaybe :: (a -> b) -> Maybe a -> Maybe b
+toMaybe f Nothing  = Nothing 
+toMaybe f (Just x) = Just (f x)
 
 
 
