@@ -5,7 +5,7 @@ data Dungeon a =  Habitacion a
                   | Bifurcacion (Maybe a) 
                                  (Dungeon a)
                                  (Dungeon a)
-
+                  deriving Show
 -- Sea A un conjunto, el conjunto Dungeon A
 -- está formado por las siguientes reglas
 
@@ -127,14 +127,13 @@ tieneSoloBif (Pasaje mx d) = False
 tieneSoloBif (Bifurcacion mx di dd) = 
 	esLineal di && esLineal dd
 
-data Dir = L | S | R
-data Path = End | D Dir Path
+
 
 -- f End = ...
 -- f (D d p) = ... f p
 
 -- Tarea:
--- retorna true si hay algo al final del path
+-- retorna True si hay algo al final del path
 esInteresanteEn :: Path -> Dungeon a -> Bool
 esInteresanteEn p        (Habitacion x)         = True
 esInteresanteEn End      (Pasaje mx d)          = trueSiJust mx
@@ -156,11 +155,37 @@ llenoDe e (Bifurcacion mx di dd) =
      && llenoDe e di
      && llenoDe e dd
 
+
 -- Desafío/Tarea:
 -- replaces the elements of the dungeon
 -- with the path to each element
---replaceWithPaths :: Dungeon a -> Dungeon Path
---replaceWithPaths (Habitacion x) = ...
---replaceWithPaths (Pasaje mx d) = ... replaceWithPaths d
---replaceWithPaths (Bifurcacion mx di dd) = ... replaceWithPaths di
---                                        	... replaceWithPaths dd
+replaceWithPaths :: Dungeon a -> Dungeon Path
+replaceWithPaths (Habitacion x)         = Habitacion  End
+replaceWithPaths (Pasaje mx d)          = Pasaje      (maybe_ Nothing (Just End) mx) 
+                                                      (addPath (D S) (replaceWithPaths d))
+replaceWithPaths (Bifurcacion mx di dd) = Bifurcacion (maybe_ Nothing (Just End) mx) 
+                                                      (addPath (D L) (replaceWithPaths di))
+                                        	            (addPath (D R) (replaceWithPaths dd))
+
+addPath :: (Path -> Path) -> Dungeon Path -> Dungeon Path
+addPath p (Habitacion x)         = Habitacion   (p x)
+addPath p (Pasaje mx d)          = Pasaje       (unirMPaths p mx)
+                                                          (addPath (p . (D S)) d)
+addPath p (Bifurcacion mx di dd) = Bifurcacion  (unirMPaths p mx) 
+                                                          (addPath (p . (D L)) di)
+                                        	                (addPath (p . (D R)) dd)
+
+unirMPaths :: (Path -> Path) -> Maybe Path -> Maybe Path
+unirMPaths fp Nothing   = Nothing 
+unirMPaths fp (Just p2) = Just (fp p2)
+
+
+data Dir  = L | S | R
+            deriving Show
+
+data Path = End | D Dir Path
+            deriving Show
+
+data Cosa = Algo
+            deriving Show
+

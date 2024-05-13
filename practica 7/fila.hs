@@ -33,14 +33,16 @@ hayBolitas c (Celda fc f) = (intToBool . fc) c || hayBolitas c f
 poner :: Color -> Int -> Fila -> Fila
 poner c i Final        = Final
 poner c i (Celda fc f) = if i == 0 
-                          then Celda (sumarUnoSiColor c fc) f 
-                          else Celda fc                     (poner c (i-1) f)
+                          then Celda (sumarUnoSiEqColor c fc) f 
+                          else Celda fc                       (poner c (i-1) f)
 
+sumarUnoSiEqColor :: Color -> (Color -> Int) -> Color -> Int
+sumarUnoSiEqColor = componerSiEqColor (1+)
 
-sumarUnoSiColor:: Color -> (Color -> Int) -> Color -> Int 
-sumarUnoSiColor c fc c' =  if c == c'
-                             then ((1+).fc) c'
-                             else fc c'
+componerSiEqColor :: (Int -> Int) -> Color -> (Color -> Int) -> Color -> Int 
+componerSiEqColor f c fc c' =  if c == c'
+                                 then (f.fc) c'
+                                 else fc     c'
 
 intToBool 1 = True
 intToBool 0 = False
