@@ -1,5 +1,4 @@
-import Prelude hiding (length, 
-                        sum, 
+import Prelude hiding ( sum, 
                         product, 
                         concat, 
                         elem, 
@@ -87,3 +86,144 @@ unzip (p:ps) = addParAParDeListas p (unzip ps)
 addParAParDeListas :: (a,b) -> ([a],[b]) -> ([a],[b])
 addParAParDeListas (a,b) (as,bs) = (a:as,b:bs) 
 
+--Seccion 2
+--Ej 1
+
+data N = Z | S N
+         deriving Show 
+
+-- f Z     = ...
+-- f (S n) = ... f n
+
+evalN :: N -> Int
+-- describe el número representado por el elemento dado.
+evalN Z     = 0
+evalN (S n) = 1 + (evalN n)
+
+addN :: N -> N -> N
+-- describe la representación unaria de la suma de los números representados por los argumentos. La
+-- resolución debe ser exclusivamente simbólica, o sea, SIN calcular cuáles son esos números.
+addN Z      n = n
+addN (S n') n = S (addN n' n)
+
+prodN :: N -> N -> N
+-- describe la representación unaria del producto de los números representados por los argumentos. La
+-- resolución debe ser exclusivamente simbólica.
+prodN Z      n = Z
+prodN (S n') n = addN n (prodN n' n)
+
+int2N :: Int -> N
+--describe la representación unaria del número dado usando el tipo N
+int2N 0 = Z
+int2N n = S (int2N (n-1))
+
+
+--Ej 2
+
+type NU = [()]
+
+evalNU :: NU -> Int
+-- describe el número representado por el elemento dado.
+evalNU []     = 0
+evalNU (x:xs) = 1 + evalNU xs
+
+succNU :: NU -> NU
+-- describe la representación unaria del resultado de sumarle uno al número representado por el argumento.
+-- La resolución debe ser exclusivamente simbólica.
+succNU [] = [()]
+succNU nu = () : nu
+
+addNU :: NU -> NU -> NU
+-- describe la representación unaria de la suma de los números representados por los argumentos. 
+-- La resolución debe ser exclusivamente simbólica.
+addNU [] nu' = nu'
+addNU nu []  = nu
+addNU nu nu' = nu ++ nu
+
+nu2n :: NU -> N
+-- describe la representación unaria dada por el tipo N correspondiente al número representado por el argumento.
+nu2n []     = Z
+nu2n (x:xs) = S (nu2n xs)
+
+n2nu :: N -> NU
+-- describe la representación unaria dada por el tipo NU correspondiente al número representado por el argumento.
+n2nu Z     = []
+n2nu (S n) = () : n2nu n
+
+
+--EJ 3
+
+data DigBin = I | O deriving Show
+type NBin = [DigBin]
+
+--0 = 0   = 0
+--1 = 1   = 1
+--2 = 10  = 01
+--3 = 11  = 11
+--4 = 100 = 001
+--5 = 101 = 101
+--6 = 110 = 011
+--7 = 111 = 111
+
+
+
+
+evalNB :: NBin -> Int
+-- describe el número representado por el elemento dado.
+evalNB nb = evalNB' (reverse nb)
+
+evalNB' :: NBin -> Int
+evalNB' []       = 0
+evalNB' (nb:nbs) = case nb of 
+                    I -> 2 ^ length nbs + evalNB' nbs
+                    O -> evalNB' nbs
+
+
+normalizarNB :: NBin -> NBin
+-- describe la representación binaria del número representado por el argumento, pero sin “ceros a
+-- la izquierda” (dígitos redundantes). OBSERVACIÓN: por la forma de la representación, los “ceros a
+-- izquierda” aparecen a la derecha de la lista. Entonces la propiedad
+-- indica que una lista de dígitos normalizada no puede terminar con eldígito 0.
+normalizarNB []       =  [] 
+normalizarNB (nb:nbs) =  if sonTodosO (normalizarNB nbs)
+                           then [nb]
+                           else nb : normalizarNB nbs
+
+sonTodosO :: NBin -> Bool
+sonTodosO []       = True
+sonTodosO (nb:nbs) = esO nb && sonTodosO nbs
+
+esO :: DigBin -> Bool
+esO O = True
+esO _ = False
+
+
+
+
+succNB :: NBin -> NBin
+-- describe la representación binaria normalizada del resultado de sumarle uno al número representado
+-- por el argumento. La resolución debe ser exclusivamente simbólica, y
+-- no debe utilizar normalizarNB. Se puede suponer como precondición que el argumento está normalizado.
+succNB = undefined
+
+addNB :: NBin -> NBin -> NBin
+-- describe la representación binaria normalizada de la suma de los números
+-- representados por los argumentos. La resolución debe ser
+-- exclusivamente simbólica (o sea, no usar ninguna forma de eval), y
+-- no debe utilizar normalizarNB. Se puede suponer como
+-- precondición que los argumentos están normalizados.
+-- AYUDA: considerar dos operaciones auxiliares
+-- addNBConCarry :: NBin -> NBin -> DigBin -> NBin
+-- addDBConCarry :: DigBin -> DigBin -> DigBin -> (DigBin, DigBin)
+addNB = undefined
+
+
+
+nb2n :: NBin -> N
+-- describe la representación unaria dada por el tipo N correspondiente al número representado por el argumento.
+nb2n = undefined
+
+n2nb :: N -> NBin
+-- describe la representación binaria normalizada dada por el tipo NBin correspondiente al número
+-- representado por el argumento
+n2nb = undefined
