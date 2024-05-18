@@ -156,28 +156,52 @@ n2nu (S n) = () : n2nu n
 data DigBin = I | O deriving Show
 type NBin = [DigBin]
 
---0 = 0   = 0
---1 = 1   = 1
---2 = 10  = 01
---3 = 11  = 11
---4 = 100 = 001
---5 = 101 = 101
---6 = 110 = 011
---7 = 111 = 111
+--0 = 0     = 0
+--1 = 1     = 1
+--2 = 10    = 01 
+--3 = 11    = 11 
+--4 = 100   = 001
+--5 = 101   = 101
+--6 = 110   = 011
+--7 = 111   = 111
+--8 = 1000  = 0001
+--9 = 1001  = 1001
+--10 = 1010 = 0101
+--11 = 1011 = 1101
 
 
 
+--6  = 110   = 011
+--10 = 1010  = 0101
+--16 = 1010  = 00001
+
+--3 = 11    = 11 
+--5 = 101   = 101
+--8 = 1000  = 0001
+
+--1  = 11     = 1 
+--15 = 111    = 1111
+--16  = 10000  = 00001
+
+--3 = 11    = 11 
+--3 = 11    = 11
+--6 = 110   = 011
 
 evalNB :: NBin -> Int
 -- describe el número representado por el elemento dado.
-evalNB nb = evalNB' (reverse nb)
+evalNB = evalNB' 0
 
-evalNB' :: NBin -> Int
-evalNB' []       = 0
-evalNB' (nb:nbs) = case nb of 
-                    I -> 2 ^ length nbs + evalNB' nbs
-                    O -> evalNB' nbs
+evalNB' :: Int -> NBin -> Int
+evalNB' i []       = 0
+evalNB' i (nb:nbs) = case nb of
+                         I ->  many (2 ^ i) (1+) (evalNB' (i+1) nbs)
+                         O ->  evalNB' (i+1) nbs
 
+-- evalNB' :: Int -> (a -> b ) -> NBin -> b 
+-- evalNB' i f []       = NEUTRO DE F ?
+-- evalNB' i f (nb:nbs) = case nb of
+--                            I ->  many (2 ^ i) f (evalNB' (i+1) f nbs)
+--                            O ->  evalNB' (i+1) f nbs
 
 normalizarNB :: NBin -> NBin
 -- describe la representación binaria del número representado por el argumento, pero sin “ceros a
@@ -198,13 +222,19 @@ esO O = True
 esO _ = False
 
 
-
-
 succNB :: NBin -> NBin
 -- describe la representación binaria normalizada del resultado de sumarle uno al número representado
 -- por el argumento. La resolución debe ser exclusivamente simbólica, y
 -- no debe utilizar normalizarNB. Se puede suponer como precondición que el argumento está normalizado.
-succNB = undefined
+succNB []       =  [I] 
+succNB (nb:nbs) =  case nb of 
+                     O -> I : nbs
+                     I -> O : (succNB nbs)
+
+
+--6  = 110   = 011
+--10 = 1010  = 0101
+--16 = 1010  = 00001
 
 addNB :: NBin -> NBin -> NBin
 -- describe la representación binaria normalizada de la suma de los números
@@ -215,15 +245,48 @@ addNB :: NBin -> NBin -> NBin
 -- AYUDA: considerar dos operaciones auxiliares
 -- addNBConCarry :: NBin -> NBin -> DigBin -> NBin
 -- addDBConCarry :: DigBin -> DigBin -> DigBin -> (DigBin, DigBin)
-addNB = undefined
+addNB []       nbs'       = nbs'
+addNB nbs      []         = nbs
+addNB (nb:nbs) (nb':nbs') = if ambosI nb nb'
+                              then O : addNBConCarry nbs nbs'
+                              else sumarDigSinCarry nb nb' : addNB nbs nbs'
 
+addNBConCarry:: NBin -> NBin -> NBin
+addNBConCarry []       nbs'       = invertirDigi nbs' ++ [I]
+addNBConCarry nbs      []         = invertirDigi nbs  ++ [I]
+addNBConCarry (nb:nbs) (nb':nbs') = if ambosI nb nb'
+                                      then I : addNBConCarry nbs nbs'
+                                      else O : addNBConCarry nbs nbs'
 
+invertirDigi :: NBin -> NBin
+invertirDigi []       = []
+invertirDigi (nb:nbs) = case nb of
+                          O -> I : (invertirDigi nbs)
+                          I -> O : (invertirDigi nbs)
+
+sumarDigSinCarry I I  = O
+sumarDigSinCarry O O  = O
+sumarDigSinCarry _ _  = I
+
+ambosI I I = True
+ambosI _ _ = False
 
 nb2n :: NBin -> N
--- describe la representación unaria dada por el tipo N correspondiente al número representado por el argumento.
-nb2n = undefined
+-- describe la representación unaria dada por el tipo 
+-- N correspondiente al número representado por el argumento.
+nb2n = nb2n' 0 
+
+nb2n' :: Int -> NBin ->  N
+nb2n' i []       = Z
+nb2n' i (nb:nbs) = case nb of
+                       I ->  many (2 ^ i) (S) (nb2n' (i+1) nbs)
+                       O ->  nb2n' (i+1) nbs 
 
 n2nb :: N -> NBin
 -- describe la representación binaria normalizada dada por el tipo NBin correspondiente al número
 -- representado por el argumento
 n2nb = undefined
+
+
+many 0 f x = x 
+many n f x = f (many (n-1) f x)     
