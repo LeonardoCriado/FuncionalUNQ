@@ -62,6 +62,7 @@ subset (x:xs) s = elem x s && subset xs s
 
 (++) :: [a] -> [a] -> [a]
 -- describe el resultado de agregar los elementos de la primera lista adelante de los elementos de la segunda.
+(++) xs     [] = xs
 (++) []     ys = ys
 (++) (x:xs) ys = x : (++) xs ys
 
