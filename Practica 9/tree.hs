@@ -81,49 +81,47 @@ TI) ¿ heightT (NodeT a t1 t2) = length (ramaMasLarga (NodeT a t1 t2)) ?
 
 IZQ)
 heightT (NodeT a t1 t2)
-=
+=                                                                  (heightT)
 1 + (heightT t1 `maxi` heightT t2)
-=					HI 1 y 2
+=					                                               (HI 1 y 2)
 1 + (length (ramaMasLarga t1) `maxi` length (ramaMasLarga t2))
 
 
 DER)
 length (ramaMasLarga (NodeT a t1 t2))
-= ramaMasLarga	
+=                                                                   (ramaMasLarga)	
 length(a : listaMasLarga (ramaMasLarga t1) (ramaMasLarga t2))
-= length
+=                                                                   (length)
 1 + ( length (listaMasLarga (ramaMasLarga t1) (ramaMasLarga t2)))
-= LEMA: length (listaMasLarga x y) = length x `maxi` length y
+=                                                                   LEMA: length (listaMasLarga x y) = length x `maxi` length y
 1 + (length (ramaMasLarga t1) `maxi` length (ramaMasLarga t2))
 
 
 Para todo x, para todo y.
 ¿length (listaMasLarga x y) = length x `maxi` length y?
 
-CASO 1)
-length x > length y
+CASO 1) length x > length y
 
 IZQ)
 length (listaMasLarga x y)
-= 								listaMasLarga 
+= 								(listaMasLarga) 
 length x
 
 DER)
 length x `maxi` length y
-= 								maxi
+= 								(maxi)
 length x
 
-CASO 2)
-length x <= length y
+CASO 2) length x <= length y
 
 IZQ)
 length (listaMasLarga x y)
-= 								listaMasLarga 
+= 								(listaMasLarga) 
 length y
 
 DER)
 length x `maxi` length y
-= 								maxi
+= 								(maxi)
 length y
 
 
