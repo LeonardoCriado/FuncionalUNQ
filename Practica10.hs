@@ -65,11 +65,11 @@ cfNExp :: NExp -> NExp
 -- subexpresiones que no dependan de la memoria por su expresión más sencilla. La resolución debe ser exclusivamente simbólica.
 cfNExp (Var v)            = Var v
 cfNExp (NCte i)           = NCte i
-cfNExp (NBOp nbo ne1 ne2) = fold nbo (cfNExp ne1) (cfNExp ne2)
+cfNExp (NBOp nbo ne1 ne2) = foldNExp nbo (cfNExp ne1) (cfNExp ne2)
 
-fold :: NBinOp -> NExp -> NExp -> NExp
-fold nbo (NCte i) (NCte i') = NCte (evalNBOp nbo i i')
-fold nbo ne1      ne2       = NBOp nbo ne1 ne2
+foldNExp :: NBinOp -> NExp -> NExp -> NExp
+foldNExp nbo (NCte i) (NCte i') = NCte (evalNBOp nbo i i')
+foldNExp nbo ne1      ne2       = NBOp nbo ne1 ne2
 
 -- ¿evalNExp . cfNExp = evalNExp?
 -- 
@@ -78,12 +78,12 @@ fold nbo ne1      ne2       = NBOp nbo ne1 ne2
 -- Para todo x.
 -- (evalNExp . cfNExp) x = evalNExp x
 -- 
--- Por def de (.)
+-- Por def de (.) y Por ppio de extensionalidad
 -- 
 -- Para todo x. Para todo m
 -- ¿ evalNExp (cfNExp x) m = evalNExp x m?
 -- 
--- Sea x un elemento de "NExp" y m un elemento de "Memoria". Por induccion en la estructura de x se verifica que:
+-- Sea x un elemento de "NExp" y m un elemento de "Memoria". Por principio de induccion en la estructura de x se verifica que:
 -- 
 -- CB1 x = Var s) siendo s un string cualquiera
 -- ¿ evalNExp (cfNExp (Var s)) m = evalNExp (Var s) m ?
@@ -161,3 +161,68 @@ fold nbo ne1      ne2       = NBOp nbo ne1 ne2
 -- 
 -- 
 -- Queda entonces demostrada la propiedad.
+
+
+--EJ 2
+
+data BExp = BCte Bool
+            | Not BExp
+            | And BExp BExp
+            | Or BExp BExp
+            | ROp RelOp NExp NExp
+            deriving Show 
+
+data RelOp = Eq | NEq  -- Equal y NotEqual
+            | Gt | GEq -- Greater y GreaterOrEqual
+            | Lt | LEq -- Lower y LowerOrEqual
+            deriving Show 
+
+-- f (BCte b)           = ...
+-- f (Not  be)          = ... f be
+-- f (And  be1 be2)     = ... f be1 ... f be2
+-- f (Or   be1 be2)     = ... f be1 ... f be2
+-- f (ROp  ro  ne1 ne2) = ...
+
+
+evalBExp :: BExp -> Memoria -> Bool 
+-- describe el booleano que resulta de evaluar la expresión dada a partir de la memoria dada.
+evalBExp (BCte b)           m = b
+evalBExp (Not  be)          m = not (evalBExp be m)
+evalBExp (And  be1 be2)     m = evalBExp be1 m && evalBExp be2 m
+evalBExp (Or   be1 be2)     m = evalBExp be1 m || evalBExp be2 m
+evalBExp (ROp  ro  ne1 ne2) m = evalROp ro (evalNExp ne1 m) (evalNExp ne2 m)
+
+evalROp :: RelOp -> Int -> Int -> Bool
+evalROp Eq  = (==)
+evalROp NEq = (/=)
+evalROp Gt  = (>)
+evalROp GEq = (>=)
+evalROp Lt  = (<)
+evalROp LEq = (<=)
+
+
+cfBExp :: BExp -> BExp 
+-- describe una expresión con el mismo significado que la dada, pero reemplazando las
+-- subexpresiones que no dependan de la memoria por su expresión
+-- más sencilla. La resolución debe ser exclusivamente simbólica.
+cfBExp (BCte b)           = BCte b
+cfBExp (Not  be)          = foldNot    (cfBExp be)
+cfBExp (And  be1 be2)     = foldAnd    (cfBExp be1) (cfBExp be2)
+cfBExp (Or   be1 be2)     = foldOr     (cfBExp be1) (cfBExp be2)
+cfBExp (ROp  ro  ne1 ne2) = foldRop ro (cfNExp ne1) (cfNExp ne2)
+
+foldNot :: BExp -> BExp
+foldNot (BCte b) = BCte (not b)
+foldNot be       = Not be
+
+foldAnd :: BExp -> BExp -> BExp
+foldAnd (BCte b1) (BCte b2) = BCte (b1 && b2)
+foldAnd be1       be2       = And be1 be2
+
+foldOr :: BExp -> BExp -> BExp
+foldOr (BCte b1) (BCte b2) = BCte (b1 || b2)
+foldOr be1       be2       = Or be1 be2
+
+foldRop :: RelOp -> NExp -> NExp -> BExp
+foldRop ro (NCte i) (NCte i') = BCte (evalROp ro i i')
+foldRop ro ne1      ne2       = ROp  ro  ne1 ne2
