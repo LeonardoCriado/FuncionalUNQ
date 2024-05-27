@@ -262,16 +262,16 @@ TI) ¿ evalBExp (cfBExp (Or be1 be2)) = evalBExp (Or be1 be2) ?
 Caso Base 2: x = ROp ro ne1 ne2) siendo ro un elemento de "RelOp" cualquiera, ne1 y ne2 elementos cualquiera de "NExp"
 ¿ evalBExp (cfBExp (ROp ro ne1 ne2)) = evalBExp (ROp ro ne1 ne2) ?
 
--- Inicion --------------- CB 2 ------------------------------
+-- Inicio ---------------- CB 2 ------------------------------
 IZQ)
 evalBExp (cfBExp (ROp ro ne1 ne2))
 =                                                (evalBExp)
 evalBExp (foldRop ro (cfNExp ne1) (cfNExp ne2))
 =                                                LEMA: evalBExp (foldRop ro x y) = evalBExp (ROp ro x y)
-evalBExp (ROp ro ne1 ne2)
-
-DER)
-evalBExp (ROp ro ne1 ne2)
+evalBExp (ROp ro ne1 ne2) <---------|
+                                    |
+DER)                                =
+evalBExp (ROp ro ne1 ne2) <---------|
 
 LEMA:
 Para todo ro, para todo x, para todo y
@@ -288,12 +288,80 @@ evalBExp (foldRop ro (NCte i) (NCte i')) m
 =                                       (foldRop)
 evalBExp (BCte (evalROp ro i i')) m
 =                                       (evalBExp)
-evalROp ro i i'
+evalROp ro i i' <--------------------------------------------------------------|
+                                                                               |
+DER)                                                                           |
+evalBExp (ROp ro (NCte i) (NCte i')) m                                         |
+=                                       (evalBExp)                             =
+evalROp ro (evalNExp (NCte i) m) (evalNExp (NCte i') m)                        |
+=                                       (evalNExp y evalNExp)                  |
+evalROp ro i i' <--------------------------------------------------------------|
 
-DER)
-evalBExp (ROp ro (NCte i) (NCte i')) m
-=                                       (evalBExp)               
-evalROp ro (evalNExp (NCte i) m) (evalNExp (NCte i') m)
-=                                       (evalNExp y evalNExp)
-evalROp ro i i'
+CASO 2) x /= (NCte i) & y /= (NCte i')
+
+IZQ)
+evalBExp (foldRop ro x y) m
+=                                       (foldRop)
+evalBExp (ROp ro x y) m <---------|
+                                  |
+DER)                              =
+evalBExp (ROp ro x y) m <---------|
+
 -- Fin ------------------- CB 2 ------------------------------
+
+-- Inicio ---------------- CB 1 ------------------------------
+¿ evalBExp (cfBExp (BCte b)) = evalBExp (BCte b) ?
+
+IZQ)
+evalBExp (cfBExp (BCte b)) 
+=                           (cfBExp) 
+evalBExp (BCte b) <------- = ------> DER) 
+-- Fin ------------------- CB 1 ------------------------------
+
+-- Inicio ---------------- CI 1 ------------------------------
+HI) ¡ evalBExp (cfBExp be) = evalBExp be !
+TI) ¿ evalBExp (cfBExp (Not be)) = evalBExp (Not be) ?
+
+IZQ)
+evalBExp (cfBExp (Not be))
+=                           (cfBExp)
+evalBExp (foldNot (cfBExp be))
+=                           LEMA: evalBExp (foldNot x) = evalBExp (Not x)
+evalBExp (Not (cfBExp be))
+=                           (evalBExp)
+not (evalBExp (cfBExp be))
+=                           HI
+not (evalBExp be) <--------------------------|
+                                             |
+DER)                                         |
+evalBExp (Not be)                            =
+=                           (evalBExp)       |
+not (evalBExp be) <--------------------------|
+
+LEMA: 
+¿ evalBExp (foldNot x) = evalBExp (Not x) ?
+
+CASO 1: x = BCte b )
+¿ evalBExp (foldNot (BCte b)) = evalBExp (Not (BCte b)) ?
+
+IZQ)
+evalBExp (foldNot (BCte b))
+=                           (foldNot)
+evalBExp (BCte (not b))
+=                           (evalBExp)
+not b <--------------------------------|
+                                       |
+DER)                                   |
+evalBExp (Not (BCte b))                |
+=                           (evalBExp) =
+not (evalBExp (BCte b))                |
+=                           (evalBExp) |
+not b <--------------------------------|
+
+CASO 2: x /= BCte b )
+IZQ)
+evalBExp (foldNot x)
+=                           (foldNot)
+evalBExp (Not x) <------- = ------> DER) evalBExp (Not x)
+
+-- Fin ------------------- CI 1 ------------------------------
