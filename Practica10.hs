@@ -238,48 +238,50 @@ por def de (.)
 
 ¿ evalBExp (cfBExp x) = evalBExp x ?
 
-Sea x un elemento de "BExp" cualquiera, por principio de induccion en la estructura de x.
-Se verifica que:
+por ppio de extensionalidad
+
+¿ evalBExp (cfBExp x) m = evalBExp x m ?
+
+Sea x un elemento de "BExp" cualquiera, m un elemento cualquiera de "Memoria" 
+por principio de induccion en la estructura de x. Se verifica que:
 
 Caso Base 1: x = BCte b) siendo b un elemento de "Bool" cualquiera.
-¿ evalBExp (cfBExp (BCte b)) = evalBExp (BCte b) ?
+¿ evalBExp (cfBExp (BCte b)) m = evalBExp (BCte b) m ?
 
 Caso Inductivo 1: x = Not be) 
-HI) ¡ evalBExp (cfBExp be) = evalBExp be !
-TI) ¿ evalBExp (cfBExp (Not be)) = evalBExp (Not be) ?
+HI) ¡ evalBExp (cfBExp be) m = evalBExp be m !
+TI) ¿ evalBExp (cfBExp (Not be)) m = evalBExp (Not be) m ?
 
 Caso Inductivo 2: x = And be1 be2)
-HI1) ¡ evalBExp (cfBExp be1) = evalBExp be1 !
-HI2) ¡ evalBExp (cfBExp be2) = evalBExp be2 !
-TI) ¿ evalBExp (cfBExp (And be1 be2)) = evalBExp (And be1 be2) ?
+HI1) ¡ evalBExp (cfBExp be1) m = evalBExp be1 m !
+HI2) ¡ evalBExp (cfBExp be2) m = evalBExp be2 m !
+TI) ¿ evalBExp (cfBExp (And be1 be2)) m = evalBExp (And be1 be2) m ?
 
 Caso Inductivo 3: x = Or be1 be2)
-HI1) ¡ evalBExp (cfBExp be1) = evalBExp be1 !
-HI2) ¡ evalBExp (cfBExp be2) = evalBExp be2 !
-TI) ¿ evalBExp (cfBExp (Or be1 be2)) = evalBExp (Or be1 be2) ?
+HI1) ¡ evalBExp (cfBExp be1) m = evalBExp be1 m !
+HI2) ¡ evalBExp (cfBExp be2) m = evalBExp be2 m !
+TI) ¿ evalBExp (cfBExp (Or be1 be2)) m = evalBExp (Or be1 be2) m ?
 
 
 Caso Base 2: x = ROp ro ne1 ne2) siendo ro un elemento de "RelOp" cualquiera, ne1 y ne2 elementos cualquiera de "NExp"
-¿ evalBExp (cfBExp (ROp ro ne1 ne2)) = evalBExp (ROp ro ne1 ne2) ?
+¿ evalBExp (cfBExp (ROp ro ne1 ne2)) m = evalBExp (ROp ro ne1 ne2) m ?
 
 -- Inicio ---------------- CB 2 ------------------------------
+
 IZQ)
-evalBExp (cfBExp (ROp ro ne1 ne2))
+evalBExp (cfBExp (ROp ro ne1 ne2)) m
 =                                                (evalBExp)
-evalBExp (foldRop ro (cfNExp ne1) (cfNExp ne2))
-=                                                LEMA: evalBExp (foldRop ro x y) = evalBExp (ROp ro x y)
-evalBExp (ROp ro ne1 ne2) <---------|
-                                    |
-DER)                                =
-evalBExp (ROp ro ne1 ne2) <---------|
+evalBExp (foldRop ro (cfNExp ne1) (cfNExp ne2)) m
+=                                                LEMA: evalBExp (foldRop ro x y) m = evalBExp (ROp ro x y) m
+evalBExp (ROp ro ne1 ne2) m <---------|
+                                      |
+DER)                                  =
+evalBExp (ROp ro ne1 ne2) m <---------|
 
 LEMA:
-Para todo ro, para todo x, para todo y
-¿ evalBExp (foldRop ro x y) = evalBExp (ROp ro x y) ?
-
-por ppio de ext
 Para todo ro, para todo x, para todo y, para todo m
 ¿ evalBExp (foldRop ro x y) m = evalBExp (ROp ro x y) m ?
+
 
 CASO 1) x = (NCte i) & y = (NCte i')
 
@@ -310,58 +312,166 @@ evalBExp (ROp ro x y) m <---------|
 -- Fin ------------------- CB 2 ------------------------------
 
 -- Inicio ---------------- CB 1 ------------------------------
-¿ evalBExp (cfBExp (BCte b)) = evalBExp (BCte b) ?
+
+¿ evalBExp (cfBExp (BCte b)) m = evalBExp (BCte b) m ?
 
 IZQ)
-evalBExp (cfBExp (BCte b)) 
+evalBExp (cfBExp (BCte b)) m
 =                           (cfBExp) 
-evalBExp (BCte b) <------- = ------> DER) 
+evalBExp (BCte b) m <------- = ------> DER) evalBExp (BCte b) m
+
 -- Fin ------------------- CB 1 ------------------------------
 
 -- Inicio ---------------- CI 1 ------------------------------
-HI) ¡ evalBExp (cfBExp be) = evalBExp be !
-TI) ¿ evalBExp (cfBExp (Not be)) = evalBExp (Not be) ?
 
-IZQ)
-evalBExp (cfBExp (Not be))
+HI) ¡ evalBExp (cfBExp be) m = evalBExp be m !
+TI) ¿ evalBExp (cfBExp (Not be)) m = evalBExp (Not be) m ?
+
+IZQ) 
+evalBExp (cfBExp (Not be)) m
 =                           (cfBExp)
-evalBExp (foldNot (cfBExp be))
-=                           LEMA: evalBExp (foldNot x) = evalBExp (Not x)
-evalBExp (Not (cfBExp be))
+evalBExp (foldNot (cfBExp be)) m
+=                           LEMA: evalBExp (foldNot x) m = evalBExp (Not x) m
+evalBExp (Not (cfBExp be)) m
 =                           (evalBExp)
-not (evalBExp (cfBExp be))
+not (evalBExp (cfBExp be) m)
 =                           HI
-not (evalBExp be) <--------------------------|
+not (evalBExp be m) <------------------------|
                                              |
 DER)                                         |
-evalBExp (Not be)                            =
+evalBExp (Not be) m                          =
 =                           (evalBExp)       |
-not (evalBExp be) <--------------------------|
+not (evalBExp be m) <------------------------|
 
 LEMA: 
-¿ evalBExp (foldNot x) = evalBExp (Not x) ?
+¿ evalBExp (foldNot x) m = evalBExp (Not x) m ?
 
 CASO 1: x = BCte b )
-¿ evalBExp (foldNot (BCte b)) = evalBExp (Not (BCte b)) ?
+¿ evalBExp (foldNot (BCte b)) m = evalBExp (Not (BCte b)) m ?
 
 IZQ)
-evalBExp (foldNot (BCte b))
+evalBExp (foldNot (BCte b)) m
 =                           (foldNot)
-evalBExp (BCte (not b))
+evalBExp (BCte (not b)) m
 =                           (evalBExp)
 not b <--------------------------------|
                                        |
 DER)                                   |
-evalBExp (Not (BCte b))                |
+evalBExp (Not (BCte b)) m              |
 =                           (evalBExp) =
-not (evalBExp (BCte b))                |
+not (evalBExp (BCte b) m)              |
 =                           (evalBExp) |
 not b <--------------------------------|
 
 CASO 2: x /= BCte b )
 IZQ)
-evalBExp (foldNot x)
+evalBExp (foldNot x) m
 =                           (foldNot)
-evalBExp (Not x) <------- = ------> DER) evalBExp (Not x)
+evalBExp (Not x) m <------- = ------> DER) evalBExp (Not x) m
 
 -- Fin ------------------- CI 1 ------------------------------
+
+-- Inicio ---------------- CI 2 ------------------------------
+
+HI1) ¡ evalBExp (cfBExp be1) m = evalBExp be1 m !
+HI2) ¡ evalBExp (cfBExp be2) m = evalBExp be2 m !
+TI) ¿ evalBExp (cfBExp (And be1 be2)) m = evalBExp (And be1 be2) m ?
+
+IZQ)
+evalBExp (cfBExp (And be1 be2)) m
+=                           (cfBExp)
+evalBExp (foldAnd (cfBExp be1) (cfBExp be2)) m
+=                           LEMA: evalBExp (foldAnd x y) m = evalBExp (And x y) m
+evalBExp (And (cfBExp be1) (cfBExp be2)) m
+=                           (evalBExp)
+evalBExp (cfBExp be1) m && evalBExp (cfBExp be1) m
+=                           HI1 y HI2
+evalBExp be1 m && evalBExp be1 m <-----|
+                                       |
+DER)                                   =
+evalBExp (And be1 be2)  m              |
+=                           (evalBExp) |
+evalBExp be1 m && evalBExp be1  m <----|
+
+LEMA: 
+Para todo x, Para todo y, para todo m
+¿ evalBExp (foldAnd x y) m = evalBExp (And x y) m?
+
+CASO 1: x = (BCte b1) & y = (BCte b2)
+
+IZQ)
+evalBExp (foldAnd (BCte b1) (BCte b2)) m
+=                           (foldAnd)
+evalBExp (BCte (b1 && b2)) m
+=                           (evalBExp)
+b1 && b2 <-----------------------------------------|
+                                                   |
+DER)                                               |
+evalBExp (And (BCte b1) (BCte b2)) m               |
+=                           (evalBExp)             =
+evalBExp (BCte b1) m && evalBExp (BCte b2) m       |
+=                           (evalBExp, evalBExp)   |
+b1 && b2 <-----------------------------------------|
+
+
+CASO 2: x /= (BCte b1) & y /= (BCte b2)
+
+IZQ)
+evalBExp (foldAnd x y) m
+=                           (foldAnd) 
+evalBExp (And x y) m <------- = ------> DER) evalBExp (And x y) m
+
+-- Fin ------------------- CI 2 ------------------------------
+
+-- Inicio ---------------- CI 3 ------------------------------
+
+HI1) ¡ evalBExp (cfBExp be1) m = evalBExp be1 m !
+HI2) ¡ evalBExp (cfBExp be2) m = evalBExp be2 m !
+TI) ¿ evalBExp (cfBExp (Or be1 be2)) m = evalBExp (Or be1 be2) m ?
+
+IZQ) 
+evalBExp (cfBExp (Or be1 be2)) m
+=                           (cfBExp)  
+evalBExp (foldOr (cfBExp be1) (cfBExp be2)) m 
+=                           LEMA: evalBExp (foldOr x y) m = evalBExp (Or x y) m
+evalBExp (Or (cfBExp be1) (cfBExp be2)) m
+=                           (evalBExp)  
+evalBExp (cfBExp be1) m || evalBExp (cfBExp be2) m 
+=                           HI1 y HI2
+evalBExp be1 m || evalBExp be2 m <------|
+                                        |
+DER)                                    | 
+evalBExp (Or be1 be2) m                 =
+=                           (evalBExp)  |
+evalBExp be1 m || evalBExp be2 m <------|
+
+LEMA: 
+Para todo x, para todo y, para todo m
+evalBExp (foldOr x y) m = evalBExp (Or x y) m
+
+CASO 1: x = (BCte b1) & y = (BCte b2)
+
+IZQ)
+evalBExp (foldOr (BCte b1) (BCte b2)) m
+=                           (foldOr)
+evalBExp (BCte (b1 || b2)) m
+=                           (evalBExp)
+b1 || b2 <----------------------------------------|
+                                                  |
+DER)                                              |
+evalBExp (Or (BCte b1) (BCte b2)) m               |
+=                           (evalBExp)            =
+evalBExp (BCte b1) m || evalBExp (BCte b2) m      |
+=                           (evalBExp, evalBExp)  |
+b1 || b2 <----------------------------------------|
+
+CASO 2: x /= (BCte b1) & y /= (BCte b2)
+
+IZQ)
+evalBExp (foldOr x y) m
+=                           (foldOr)
+evalBExp (Or x y) m <------- = ------> DER) evalBExp (Or x y) m
+
+-- Fin ------------------- CI 3 ------------------------------
+
+Queda entonces demostrada la propiedad.
