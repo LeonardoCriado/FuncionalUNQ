@@ -1,4 +1,4 @@
-data Color = Rojo | Negro | Azul | Verde 
+    data Color = Rojo | Negro | Azul | Verde 
              deriving Eq
 -- Tarea: fila de Gobstones
 data Fila = Final | Celda (Color -> Int) Fila 
