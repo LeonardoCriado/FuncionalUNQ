@@ -1,5 +1,5 @@
 data SetExp a = Empty
-	          | Add a (SetExp a)
+	       | Add a (SetExp a)
               | Remove a (SetExp a)
               | Union (SetExp a) (SetExp a)
               | Intersection (SetExp a) (SetExp a)
@@ -51,13 +51,6 @@ aplicarSi fb f g a b = if fb a b
                           then f a b
                           else g a b
 
-e1 = (Add 1 (Add 2 Empty))
-e1' = sequenceS [Add 1, Add 2] Empty
-e2 = (Add 2 (Add 3 Empty))
-e3 = Union e1 e2
-e4 = Intersection e1 e2
-
-
 -- como funcion
 evalS2 :: Eq a => SetExp a -> (a -> Bool)
 evalS2 Empty                = const False
@@ -90,38 +83,52 @@ evalS3 (Remove a s1)        = evalRemove3 a  (evalS3 s1)
 evalS3 (Union        s1 s2) = evalUnion3     (evalS3 s1) (evalS3 s2)
 evalS3 (Intersection s1 s2) = evalIntersect3 (evalS3 s1) (evalS3 s2)
 
-evalAdd3:: Ord a => a -> BST a -> BST a
-evalAdd3 = aplicarSi estaEnBST (flip const) insertBST
 
-evalRemove3:: Ord a => a -> BST a -> BST a
-evalRemove3 = aplicarSi estaEnBST removeBST (flip const) 
+evalAdd3:: Ord a => a -> BST a -> BST a                         
+evalAdd3 = insertBST
+
+evalRemove3:: Ord a => a -> BST a -> BST a                      
+evalRemove3 = removeBST
+
+evalUnion3:: (Ord a) => BST a -> BST a -> BST a
+evalUnion3 = unirBST
+
+evalIntersect3:: (Ord a) => BST a -> BST a -> BST a
+evalIntersect3 EmptyT        bst  = EmptyT
+evalIntersect3 (NodeT v l r) bst  = if estaEnBST v bst 
+                                      then NodeT v (evalIntersect3 l bst) (evalIntersect3 r bst)
+                                      else unirBST (evalIntersect3 l bst) (evalIntersect3 r bst)
+
+
+insertBST :: (Ord a) => a -> BST a -> BST a
+insertBST x EmptyT        = NodeT x EmptyT EmptyT
+insertBST x (NodeT v l r) = operarNodo x v (NodeT v) insertBST l r 
+       
+
+removeBST :: (Ord a) => a -> BST a -> BST a
+removeBST x EmptyT        = EmptyT
+removeBST x (NodeT v l r) = operarNodo x v unirBST removeBST l r
+       
+
+unirBST:: (Ord a) => BST a -> BST a -> BST a
+unirBST EmptyT        = id
+unirBST (NodeT v l r) = (insertBST v . (unirBST l) . (unirBST r))
 
 
 estaEnBST :: (Ord a) => a -> BST a -> Bool
 estaEnBST x EmptyT        = False
-estaEnBST x (NodeT v l r) = x == v || aplicarARamas x v (estaEnBST x) l r
-
-aplicarARamas :: (Ord a) => a -> a -> (b -> c) -> b -> b -> c
-aplicarARamas x v f l r = if x < v then f l else f r
-
-insertBST :: (Ord a) => a -> BST a -> BST a
-insertBST x EmptyT        = NodeT x EmptyT EmptyT
-insertBST x (NodeT v l r) = if x < v 
-                              then NodeT v (insertBST x l) r
-                              else NodeT v l (insertBST x r) 
-
-removeBST :: (Ord a) => a -> BST a -> BST a
-removeBST x EmptyT        = EmptyT
-removeBST x (NodeT v l r) = if x == v 
-                              then unirBST l r
-                              else if x < v 
-                                     then Node v (removeBST x l) r 
-                                     else Node v l (removeBST x l)
+estaEnBST x (NodeT v l r) = x == v || (estaEnBST x l) || (estaEnBST x r)
 
 
-
-
-
+operarNodo :: (Ord a) => a -> a -> (BST a -> BST a -> BST a) -> (a -> BST a -> BST a) -> BST a -> BST a -> BST a
+operarNodo x v h f = if x == v 
+                        then h  
+                        else operarRamasBST x v f
+ 
+operarRamasBST :: (Ord a) => a -> a -> (a -> BST a -> BST a) -> BST a -> BST a -> BST a
+operarRamasBST x v f l r = if x < v 
+                              then NodeT v (f x l) r 
+                              else NodeT v l (f x r)
 
 
 sequenceS :: [SetExp a -> SetExp a] -> (SetExp a -> SetExp a)
@@ -130,5 +137,9 @@ sequenceS (f:fs) = f . sequenceS fs
 
 
 
---evalRemove2:: Eq a => a -> (a -> Bool) -> (a -> Bool)
---evalRemove2 = aplicarSi (flip $) ((.) not) (flip const) 
+e1 = (Add 1 (Add 2 Empty))
+e1' = sequenceS [Add 1, Add 2] Empty
+e2 = (Add 2 (Add 3 Empty))
+e3 = Union e1 e2
+e4 = Intersection e1 e2
+
