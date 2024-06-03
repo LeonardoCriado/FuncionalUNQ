@@ -9,7 +9,7 @@ data Fila = Final | Celda (Color -> Int) Fila
 -- inductivo Fila (basado el tipo algebraico Fila definido anteriormente)
 
 -- Caso Base 1      : Final esta en el conjunto Fila
--- Caso inductivo 1 : Sea c un elemento del conjunto (Color -> Int), y f' un elemento del conjunto Fila, 
+    -- Caso inductivo 1 : Sea c un elemento del conjunto (Color -> Int), y f' un elemento del conjunto Fila, 
 --                    Celda c f' pertenece al conjunto Fila
 
 

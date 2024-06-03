@@ -1,4 +1,4 @@
-data BST a = EmptyT 
+dat a BST a = EmptyT 
            | NodeT a (BST a) (BST a)
            deriving Show
 
