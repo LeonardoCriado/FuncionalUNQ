@@ -66,7 +66,6 @@ evalS2 (Remove a s1)        = evalRemove2 a  (evalS2 s1)
 evalS2 (Union        s1 s2) = evalUnion2     (evalS2 s1) (evalS2 s2)
 evalS2 (Intersection s1 s2) = evalIntersect2 (evalS2 s1) (evalS2 s2) 
 
-
 evalAdd2:: Eq a => a -> (a -> Bool) -> (a -> Bool)
 evalAdd2 x = componerCon (||) (==x)
 
@@ -92,11 +91,32 @@ evalS3 (Union        s1 s2) = evalUnion3     (evalS3 s1) (evalS3 s2)
 evalS3 (Intersection s1 s2) = evalIntersect3 (evalS3 s1) (evalS3 s2)
 
 evalAdd3:: Ord a => a -> BST a -> BST a
-evalAdd3 = aplicarSi estaEnBST (flip const) agregarABST
+evalAdd3 = aplicarSi estaEnBST (flip const) insertBST
 
 evalRemove3:: Ord a => a -> BST a -> BST a
-evalRemove3 = aplicarSi estaEnBST sacarDeBST (flip const) 
+evalRemove3 = aplicarSi estaEnBST removeBST (flip const) 
 
+
+estaEnBST :: (Ord a) => a -> BST a -> Bool
+estaEnBST x EmptyT        = False
+estaEnBST x (NodeT v l r) = x == v || aplicarARamas x v (estaEnBST x) l r
+
+aplicarARamas :: (Ord a) => a -> a -> (b -> c) -> b -> b -> c
+aplicarARamas x v f l r = if x < v then f l else f r
+
+insertBST :: (Ord a) => a -> BST a -> BST a
+insertBST x EmptyT        = NodeT x EmptyT EmptyT
+insertBST x (NodeT v l r) = if x < v 
+                              then NodeT v (insertBST x l) r
+                              else NodeT v l (insertBST x r) 
+
+removeBST :: (Ord a) => a -> BST a -> BST a
+removeBST x EmptyT        = EmptyT
+removeBST x (NodeT v l r) = if x == v 
+                              then unirBST l r
+                              else if x < v 
+                                     then Node v (removeBST x l) r 
+                                     else Node v l (removeBST x l)
 
 
 
