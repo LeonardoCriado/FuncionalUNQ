@@ -71,7 +71,7 @@ pizzaProcesada f b (Capa i p) = f i (pizzaProcesada f b p)
 
 -- Ej 4
 cantidadCapasQueCumplen':: (Ingrediente -> Bool) -> Pizza -> Int
-cantidadCapasQueCumplen' = flip (pizzaProcesada (\i -> \h -> \f -> boolToint (f i) + h f)  (\g -> 0))
+cantidadCapasQueCumplen' f = pizzaProcesada (\i -> \n -> boolToint (f i) + n)  0
 --b = (Ingrediente -> Bool) -> Int
 --f :: (Ingrediente -> ((Ingrediente -> Bool) -> Int) -> ((Ingrediente -> Bool) -> Int))
 

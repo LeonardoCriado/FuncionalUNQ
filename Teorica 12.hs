@@ -51,38 +51,36 @@ minElem = rec23 (error "No hay elementos")
                 (\h -> \n -> \t1r -> \t1 -> \x -> \t2r -> \t2 -> \y -> \t3r -> \t3 -> if ((not.esCero) t1) then t1r else x )
 
 
-search23 :: Eq a => a -> BST23 a -> Maybe a
+search23 :: Ord a => a -> BST23 a -> Maybe a
 search23 e = fold23 Nothing
-                    (\h -> \n -> \t1 -> \x -> \t2 ->              elegirJust [ t1 , justIf (==) e x , t2] )
-                    (\h -> \n -> \t1 -> \x -> \t2 -> \y -> \t3 -> elegirJust [ t1 , justIf (==) e x , t2 , justIf (==) e y , t3 ] )
+                    (\h -> \n -> \t1 -> \x -> \t2 ->              case compare e x of
+                                                                       EQ -> Just e
+                                                                       LT -> t1
+                                                                       GT -> t2 )
+                    (\h -> \n -> \t1 -> \x -> \t2 -> \y -> \t3 -> case compare e x of
+                                                                       EQ -> Just e
+                                                                       LT -> t1
+                                                                       GT -> case compare e y of
+                                                                                  EQ -> Just y
+                                                                                  LT -> t2
+                                                                                  GT -> t3)
 
 
-elegirJust :: [Maybe a] -> Maybe a
-elegirJust = foldr justIfJust Nothing
-
-justIfJust :: Maybe a -> Maybe a -> Maybe a 
-justIfJust (Just x) _ = Just x
-justIfJust _        y = y
-
-justIf :: (a -> b -> Bool) -> a -> b -> Maybe a 
-justIf f x y = if f x y then Just x else Nothing
-
-
-insert23 :: Eq a => a -> BST23 a -> BST23 a
-insert23 e = fold23 (insertarCero e Cero)
-                    (\h -> \n -> \t1 -> \x -> \t2 ->            if e==x 
-                                                                   then Dos h n t1 x t2 
-                                                                   else insertarDos h n t1 x t2 e )
-                    (\h -> \n -> \t1 -> \x -> \t2 -> \y -> \t3 -> elegirJust [ t1 , justIf (==) e x , t2 , justIf (==) e y , t3 ] )
-
-
-insertarCero :: a -> BST23 a -> BST23 a
-insertarCero e = Dos 1 1 Cero e
-
-insertarDos :: Int -> Int -> BST23 a -> a -> BST23 a -> a -> BST23 a
-insertarDos h n t1 x t2 e
-            | e > (maxElem t1) && e < (minElem t2) = 
-
+--insert23 :: Eq a => a -> BST23 a -> BST23 a
+--insert23 e = fold23 (insertarCero e Cero)
+--                    (\h -> \n -> \t1 -> \x -> \t2 ->            if e==x 
+--                                                                   then Dos h n t1 x t2 
+--                                                                   else insertarDos h n t1 x t2 e )
+--                    (\h -> \n -> \t1 -> \x -> \t2 -> \y -> \t3 -> elegirJust [ t1 , justIf (==) e x , t2 , justIf (==) e y , t3 ] )
+--
+--
+--insertarCero :: a -> BST23 a -> BST23 a
+--insertarCero = Dos 1 1 Cero
+--
+--insertarDos :: Int -> Int -> BST23 a -> a -> BST23 a -> a -> BST23 a
+--insertarDos h n t1 x t2 e
+--            | (maxElem t1) < e && e < (minElem t2) = Dos h n (t1) 
+--
 
 e1 = Tres 3 5 
       (Dos 2 1 Cero 1 Cero) 
