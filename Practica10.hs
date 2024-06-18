@@ -227,7 +227,7 @@ foldRop :: RelOp -> NExp -> NExp -> BExp
 foldRop ro (NCte i) (NCte i') = BCte (evalROp ro i i')
 foldRop ro ne1      ne2       = ROp  ro  ne1 ne2
 
-
+Demo:
 ¿ evalBExp . cfBExp = evalBExp ?
 
 por ppio de extensionalidad

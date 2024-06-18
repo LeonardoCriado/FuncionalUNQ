@@ -59,3 +59,69 @@ ea2Arbol' = foldEA Empty NodeT
 
 
 e1 = BOp Sum (BOp Mul (Const 1) (BOp Mul (Const 3) (Const 2))) (Const (0))
+
+
+evalEA :: EA -> Int
+evalEA (Const x)      = x
+evalEA (BOp bo e1 e2) = evalBop bo (evalEA e1) (evalEA e2)
+
+
+
+-- DEMO:
+-- 
+-- ¿ evalEA' = evalEA ?
+-- 
+-- Por ppio de extensionalidad
+-- 
+-- Para todo x
+-- ¿ evalEA' x = evalEA x ?
+-- 
+-- Sea x un elemento cualquiera de EA, por principio de induccion en la estructura de x:
+-- 
+-- CB) x = Const x , siendo x un elemento de Int cualquiera
+-- ¿ evalEA' (Const x) = evalEA (Const x) ?
+-- 
+-- CI) x = (BOp bo e1 e2) Siendo bo un elemento de BinOp
+-- HI 1) ¡ evalEA' e1 = evalEA e1 !
+-- HI 2) ¡ evalEA' e2 = evalEA e2 !
+-- TI) ¿ evalEA' (BOp bo e1 e2) = evalEA (BOp bo e1 e2) ?
+-- 
+-- CB:
+-- IZQ)
+--   evalEA' (Const x)
+-- =                           (evalEA')
+--   (foldEA id evalBop) (Const x)
+-- =                           (foldEA)
+--   id x
+-- =                           (id)
+--   x <---------------------------------|
+--                                       |
+-- DER)                                  =
+--   evalEA' (Const x)                   |
+-- =                           (evalEA)  |
+--   x <---------------------------------|
+-- 
+-- CI:
+-- IZQ)
+--   evalEA' (BOp bo e1 e2)
+-- =                                      LEMA : evalEA' (BOp bo e1 e2) = evalBop bo (evalEA' e1) (evalEA' e2)
+--   evalBop bo (evalEA' e1) (evalEA' e2)
+-- =                                      (HI1 y HI2)
+--   evalBop bo (evalEA e1) (evalEA e2) <------------|
+--                                                   |
+-- DER)                                              |
+--   evalEA (BOp bo e1 e2)                           =
+-- =                                      (evalEA)   |
+--   evalBop bo (evalEA e1) (evalEA e2) <------------|
+-- 
+-- 
+-- LEMA: ¿ evalEA' (BOp bo e1 e2) = evalBop bo (evalEA' e1) (evalEA' e2) ?
+-- IZQ)
+--   evalEA' (BOp bo e1 e2) 
+-- =                                                          (evalExpA')
+--   foldEA id evalBop (BOp bo e1 e2)
+-- =                                                          (foldEA)
+--   evalBop bo (foldEA id evalBop e1) (foldEA id evalBop e2)
+-- =                                                          (evalEA')
+--   evalBop bo (evalEA' e1) (evalEA' e2)
+-- 
