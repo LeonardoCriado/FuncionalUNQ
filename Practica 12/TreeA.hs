@@ -145,93 +145,93 @@ int2str 4 = "cuatro"
 int2str 5 = "cinco"
 
 
-DEMO: 
-
-para todo f. 
-¿ sizeT . mapT f = sizeT ?
-
-por ppio de ext
-
-para todo f. para todo t.
-¿ (sizeT . mapT f) t = sizeT t ?
-
-por def de (.)
-
-para todo f. para todo t.
-¿ sizeT (mapT f t) = sizeT t ?
-
-Siendo f una funcion cualquiera y t un elemento de "Tree a". 
-Por principio de inducción en la estructura de t :
-
-CB) t = EmptyT
-¿ sizeT (mapT f EmptyT) = sizeT EmptyT ?
-
-CI) t = NodeT a t1 t2
-HI 1) ¡ sizeT (mapT f t1) = sizeT t1 !
-HI 2) ¡ sizeT (mapT f t2) = sizeT t2 !
-TI) ¿ sizeT (mapT f (NodeT a t1 t2)) = sizeT (NodeT a t1 t2) ?
-
-CB:
-IZQ)
-  sizeT (mapT f EmptyT)
-=                                           (mapT f)
-  sizeT (foldT EmptyT (NodeT . f) EmptyT)
-=                                           (foldT)
-  sizeT EmptyT --> = a derecha
-
-CI:
-IZQ)
-  sizeT (mapT f (NodeT a t1 t2))
-=                                                                                     LEMA : sizeT (mapT f (NodeT a t1 t2)) = 1 + sizeT (mapT f t1) + sizeT (mapT f t2)
-  1 + sizeT (mapT f t1) + sizeT (mapT f t2)
-=                                                                                     (HI 1 y 2)
-  1 + sizeT t1 + sizeT t2
-=                                                                                     (sizeT, size T)
-  1 + (foldT 0 (\e t1 t2 -> 1 + t1 + t2) t1) + (foldT 0 (\e t1 t2 -> 1 + t1 + t2) t2)
-
-DER)
-  sizeT (NodeT a t1 t2)
-=                                                                                     (sizeT)
-  foldT 0 (\e t1 t2 -> 1 + t1 + t2) (NodeT a t1 t2)
-=                                                                                     (foldT)
-  (\e t1 t2 -> 1 + t1 + t2) a (foldT 0 (\e t1 t2 -> 1 + t1 + t2) t1) 
-                              (foldT 0 (\e t1 t2 -> 1 + t1 + t2) t2)
-=                                                                                     (lamda)
-  1 + (foldT 0 (\e t1 t2 -> 1 + t1 + t2) t1) + (foldT 0 (\e t1 t2 -> 1 + t1 + t2) t2)
-
-
-
-LEMA : 
-
-Para todo f, para todo t1, para todo t2.
-¿ sizeT (mapT f (NodeT a t1 t2)) = 1 + sizeT (mapT f t1) + sizeT (mapT f t2) ?
-
-IZQ)
-  sizeT (mapT f (NodeT a t1 t2))
-=                                                                           (mapT f)
-  sizeT (foldT EmptyT (NodeT . f) (NodeT a t1 t2))
-=                                                                           (foldT)
-  sizeT ((NodeT . f) a (foldT EmptyT (NodeT . f) t1) 
-                       (foldT EmptyT (NodeT . f) t2))
-=                                                                           (mapT)
-  sizeT ((NodeT . f) a (mapT f t1) (mapT f t2))
-=                                                                           (.)
-  sizeT (NodeT (f a) (mapT f t1) (mapT f t2))
-=                                                                           (sizeT)
-  foldT 0 (\e t1 t2 -> 1 + t1 + t2) (NodeT (f a) (mapT f t1) 
-                                                 (mapT f t2)) 
-=                                                                           (foldT)
-  (\e t1 t2 -> 1 + t1 + t2) (f a) 
-                            (foldT 0 (\e t1 t2 -> 1 + t1 + t2) (mapT f t1))  
-                            (foldT 0 (\e t1 t2 -> 1 + t1 + t2) (mapT f t2))
-=                                                                           (mapT)
-  1 + (foldT 0 (\e t1 t2 -> 1 + t1 + t2) (mapT f t1)) + 
-      (foldT 0 (\e t1 t2 -> 1 + t1 + t2) (mapT f t2))
-=                                                                           (sizeT)
-  1 + (sizeT (mapT f t1)) + (sizeT (mapT f t2))
-
-
-
-
-ii. para todo f. para todo g. mapT f . mapT g = mapT (f . g)
-iii. foldT EmptyT NodeT = id
+-- DEMO: 
+-- 
+-- para todo f. 
+-- ¿ sizeT . mapT f = sizeT ?
+-- 
+-- por ppio de ext
+-- 
+-- para todo f. para todo t.
+-- ¿ (sizeT . mapT f) t = sizeT t ?
+-- 
+-- por def de (.)
+-- 
+-- para todo f. para todo t.
+-- ¿ sizeT (mapT f t) = sizeT t ?
+-- 
+-- Siendo f una funcion cualquiera y t un elemento de "Tree a". 
+-- Por principio de inducción en la estructura de t :
+-- 
+-- CB) t = EmptyT
+-- ¿ sizeT (mapT f EmptyT) = sizeT EmptyT ?
+-- 
+-- CI) t = NodeT a t1 t2
+-- HI 1) ¡ sizeT (mapT f t1) = sizeT t1 !
+-- HI 2) ¡ sizeT (mapT f t2) = sizeT t2 !
+-- TI) ¿ sizeT (mapT f (NodeT a t1 t2)) = sizeT (NodeT a t1 t2) ?
+-- 
+-- CB:
+-- IZQ)
+--   sizeT (mapT f EmptyT)
+-- =                                           (mapT f)
+--   sizeT (foldT EmptyT (NodeT . f) EmptyT)
+-- =                                           (foldT)
+--   sizeT EmptyT --> = a derecha
+-- 
+-- CI:
+-- IZQ)
+--   sizeT (mapT f (NodeT a t1 t2))
+-- =                                                                                     LEMA : sizeT (mapT f (NodeT a t1 t2)) = 1 + sizeT (mapT f t1) + sizeT (mapT f t2)
+--   1 + sizeT (mapT f t1) + sizeT (mapT f t2)
+-- =                                                                                     (HI 1 y 2)
+--   1 + sizeT t1 + sizeT t2
+-- =                                                                                     (sizeT, size T)
+--   1 + (foldT 0 (\e t1 t2 -> 1 + t1 + t2) t1) + (foldT 0 (\e t1 t2 -> 1 + t1 + t2) t2)
+-- 
+-- DER)
+--   sizeT (NodeT a t1 t2)
+-- =                                                                                     (sizeT)
+--   foldT 0 (\e t1 t2 -> 1 + t1 + t2) (NodeT a t1 t2)
+-- =                                                                                     (foldT)
+--   (\e t1 t2 -> 1 + t1 + t2) a (foldT 0 (\e t1 t2 -> 1 + t1 + t2) t1) 
+--                               (foldT 0 (\e t1 t2 -> 1 + t1 + t2) t2)
+-- =                                                                                     (lamda)
+--   1 + (foldT 0 (\e t1 t2 -> 1 + t1 + t2) t1) + (foldT 0 (\e t1 t2 -> 1 + t1 + t2) t2)
+-- 
+-- 
+-- 
+-- LEMA : 
+-- 
+-- Para todo f, para todo t1, para todo t2.
+-- ¿ sizeT (mapT f (NodeT a t1 t2)) = 1 + sizeT (mapT f t1) + sizeT (mapT f t2) ?
+-- 
+-- IZQ)
+--   sizeT (mapT f (NodeT a t1 t2))
+-- =                                                                           (mapT f)
+--   sizeT (foldT EmptyT (NodeT . f) (NodeT a t1 t2))
+-- =                                                                           (foldT)
+--   sizeT ((NodeT . f) a (foldT EmptyT (NodeT . f) t1) 
+--                        (foldT EmptyT (NodeT . f) t2))
+-- =                                                                           (mapT)
+--   sizeT ((NodeT . f) a (mapT f t1) (mapT f t2))
+-- =                                                                           (.)
+--   sizeT (NodeT (f a) (mapT f t1) (mapT f t2))
+-- =                                                                           (sizeT)
+--   foldT 0 (\e t1 t2 -> 1 + t1 + t2) (NodeT (f a) (mapT f t1) 
+--                                                  (mapT f t2)) 
+-- =                                                                           (foldT)
+--   (\e t1 t2 -> 1 + t1 + t2) (f a) 
+--                             (foldT 0 (\e t1 t2 -> 1 + t1 + t2) (mapT f t1))  
+--                             (foldT 0 (\e t1 t2 -> 1 + t1 + t2) (mapT f t2))
+-- =                                                                           (mapT)
+--   1 + (foldT 0 (\e t1 t2 -> 1 + t1 + t2) (mapT f t1)) + 
+--       (foldT 0 (\e t1 t2 -> 1 + t1 + t2) (mapT f t2))
+-- =                                                                           (sizeT)
+--   1 + (sizeT (mapT f t1)) + (sizeT (mapT f t2))
+-- 
+-- 
+-- 
+-- 
+-- ii. para todo f. para todo g. mapT f . mapT g = mapT (f . g)
+-- iii. foldT EmptyT NodeT = id
