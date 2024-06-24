@@ -56,15 +56,20 @@ zipWithT' f (NodeT x t1 t2) (NodeT y t1' t2') = NodeT (f x y) (zipWithT' f t1 t1
 zipWithT' f t               t'                = EmptyT 
 
 zipWithT :: (a->b->c) -> Tree a -> Tree b -> Tree c
-zipWithT f = foldT (\tb -> EmptyT) (\x t1 t2 -> \tb -> case tb of
-                                                            EmptyT          -> EmptyT
-                                                            NodeT y tb1 tb2 -> NodeT (f x y) (t1 tb1) (t2 tb2) )
+zipWithT f = foldT (const EmptyT) (\x t1 t2 tb -> case tb of
+                                                        EmptyT          -> EmptyT
+                                                        NodeT y tb1 tb2 -> NodeT (f x y) (t1 tb1) (t2 tb2) )
 
--- zipWithT2 :: (a->b->c) -> Tree a -> Tree b -> Tree c
--- zipWithT2 f = foldT (\tb -> EmptyT) (\x t1 t2 -> \tb -> foldT EmptyT (\y tb1 tb2 -> NodeT (f x y) (t1 tb1) (t2 tb2)))
+
+
+zipWithT2 :: (a->b->c) -> Tree a -> Tree b -> Tree c
+zipWithT2 f = foldT g h
+          where g _                         = EmptyT
+                h x t1 t2 EmptyT            = EmptyT
+                h x t1 t2 (NodeT y tb1 tb2) = NodeT (f x y) (t1 tb1) (t2 tb2) 
 
 caminoMasLargo :: Tree a -> [a]
-caminoMasLargo = foldT [] (\x t1 t2 -> x : (listaMasLarga t1 t2))
+caminoMasLargo = foldT [] (\x t1 t2 -> x : listaMasLarga t1 t2)
 
 listaMasLarga t1 t2 = if length t1 > length t2 then t1 else t2
 
@@ -111,6 +116,23 @@ caminoHasta e = recT [] (\x tr1 t1 tr2 t2 -> if e == x
 existeEn :: Eq a => a -> Tree a -> Bool
 existeEn e = foldT False (\x t1 t2 -> e == x || t1 || t2)
 
+
+esBST :: Ord a => Tree a -> Bool
+esBST = recT True f
+     where f x tr1 t1 tr2 t2 = x `esMayorATodos` t1 && 
+                               x `esMenorATodos` t2 && 
+                               tr1 && tr2
+
+esMayorATodos:: Ord a => a -> Tree a -> Bool
+esMayorATodos = esATodos (>)
+
+esMenorATodos:: Ord a => a -> Tree a -> Bool
+esMenorATodos = esATodos (<)
+
+esATodos:: Ord a => (a -> a -> Bool) -> a -> Tree a -> Bool
+esATodos p x = foldT True (\y t1 t2 -> p x y && t1 && t2)
+
+
 e1 :: Tree Int
 e1 = (NodeT 1 
             EmptyT 
@@ -127,7 +149,7 @@ e2 :: Tree Int
 e2 = (NodeT 5 
             (NodeT 1 
                    EmptyT 
-                   EmptyT 
+                   (NodeT 2 EmptyT EmptyT) 
             ) 
             (NodeT 7 
                    EmptyT 
@@ -235,3 +257,5 @@ int2str 5 = "cinco"
 -- 
 -- ii. para todo f. para todo g. mapT f . mapT g = mapT (f . g)
 -- iii. foldT EmptyT NodeT = id
+
+

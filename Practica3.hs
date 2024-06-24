@@ -1,8 +1,8 @@
-curry :: ((a,b)->c) -> a -> b -> c
-curry = \f x y -> (f (x,y))
 
-uncurry :: (a->b->c) -> (a,b) -> c
-uncurry = \f (x,y) -> (f x y)
+suma:: Int -> Int -> Int
+suma = \x -> \y -> x + y
 
-suma (x,y) = x+y
+--compose :: (a -> b) -> (c -> a) -> c -> b
+compose f g x = f(g x)
+
 
