@@ -119,7 +119,7 @@ existeEn e = foldT False (\x t1 t2 -> e == x || t1 || t2)
 
 esBST :: Ord a => Tree a -> Bool
 esBST = recT True f
-     where f x tr1 t1 tr2 t2 = x `(allT.(>))` t1 && 
+     where f x tr1 t1 tr2 t2 = x `esMayorATodos` t1 && 
                                x `esMenorATodos` t2 && 
                                tr1 && tr2
 
