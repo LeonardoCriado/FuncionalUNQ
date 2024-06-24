@@ -119,19 +119,28 @@ existeEn e = foldT False (\x t1 t2 -> e == x || t1 || t2)
 
 esBST :: Ord a => Tree a -> Bool
 esBST = recT True f
-     where f x tr1 t1 tr2 t2 = x `esMayorATodos` t1 && 
+     where f x tr1 t1 tr2 t2 = x `(allT.(>))` t1 && 
                                x `esMenorATodos` t2 && 
                                tr1 && tr2
 
 esMayorATodos:: Ord a => a -> Tree a -> Bool
-esMayorATodos = esATodos (>)
+esMayorATodos = allT.(>)
 
 esMenorATodos:: Ord a => a -> Tree a -> Bool
-esMenorATodos = esATodos (<)
+esMenorATodos = allT.(<)
 
-esATodos:: Ord a => (a -> a -> Bool) -> a -> Tree a -> Bool
-esATodos p x = foldT True (\y t1 t2 -> p x y && t1 && t2)
+allT:: Ord a => (a -> Bool) -> Tree a -> Bool
+allT p = foldT True (\x t1 t2 -> p x && t1 && t2)
 
+esAVL :: Tree a -> Bool
+esAVL = recT True f
+     where f x tr1 t1 tr2 t2 = abs (heightT t1 - heightT t2) <= 1 && tr1 && tr2
+
+esBSTyAVL :: Ord a => Tree a -> Bool
+esBSTyAVL = conjunct esBST esAVL
+
+conjunct :: (a -> Bool) -> (a -> Bool) -> a -> Bool
+conjunct p1 p2 x = p1 x && p2 x
 
 e1 :: Tree Int
 e1 = (NodeT 1 
