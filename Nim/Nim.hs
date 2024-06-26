@@ -47,7 +47,8 @@ branches = foldGame [[]] (\(m,jo) jp -> map (m:) (jo ++ jp))
 
 -- Ej 3)
 
---turn :: Nim -> Move -> Maybe Nim -- ERROR Int -> Maybe ((a,Int) -> Nim) -> Nim -> (a,Int) -> Maybe Nim
+--turn :: Nim -> Move -> Maybe Nim 
+---- ERROR: g Int -> Maybe ((a,Int) -> Nim) -> Nim -> (a,Int) -> Maybe Nim
 --turn = recNim f g               
 --     where f              _     = Nothing 
 --           g x r        n (0,k) = case compare k x of GT -> Nothing 
@@ -56,8 +57,17 @@ branches = foldGame [[]] (\(m,jo) jp -> map (m:) (jo ++ jp))
 --           g x Nothing  n _     = Nothing
 --           g x (Just r) n (i,k) = Just (Heap x (r (i-1,k)))
 
+turn :: Nim -> Move -> Maybe Nim 
+turn = recNim f g               
+     where f       _     = Nothing 
+           g x r n (0,k) = case compare k x of GT -> Nothing 
+                                               EQ -> Just n
+                                               LT -> Just (Heap (x-k) n)
+           g x r n (i,k) = case r (i-1,k) of Just ni -> Just (Heap x ni)
+                                             Nothing -> Nothing           
+
 moves :: Nim -> [Move] -- retorna la lista de jugadas válidas del jugador actual
-moves = foldNim [] (\x r -> listaDeJugdasHeap x ++ incrementarIndices r)
+moves = foldNim [] (\x r -> listaDeJugdasHeap x ++ incrementarIndices r) --error me olvide de cambiar rec por fold
 
 listaDeJugdasHeap :: Int -> [Move]
 listaDeJugdasHeap 0 = [] 
@@ -68,3 +78,6 @@ incrementarIndices = map sumarAlPrimero
 
 sumarAlPrimero :: (Int,Int) -> (Int,Int)
 sumarAlPrimero (x, y) = (x+1, y)
+
+
+
