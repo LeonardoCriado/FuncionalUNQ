@@ -47,17 +47,17 @@ branches = foldGame [[]] (\(m,jo) jp -> map (m:) (jo ++ jp))
 
 -- Ej 3)
 
-turn :: Nim -> Move -> Maybe Nim -- que lleva a cabo una jugada si es posible
-turn = recNim f g               
-     where f              _     = Nothing 
-           g x r        n (0,k) = case compare k x of GT -> Nothing 
-                                                      EQ -> Just n
-                                                      LT -> Just (Heap (x-k) n)
-           g x Nothing  n (i,k) = Nothing
-           g x (Just r) n (i,k) = Just (Heap x (r (i-1,k)))
+--turn :: Nim -> Move -> Maybe Nim -- ERROR Int -> Maybe ((a,Int) -> Nim) -> Nim -> (a,Int) -> Maybe Nim
+--turn = recNim f g               
+--     where f              _     = Nothing 
+--           g x r        n (0,k) = case compare k x of GT -> Nothing 
+--                                                      EQ -> Just n
+--                                                      LT -> Just (Heap (x-k) n)
+--           g x Nothing  n _     = Nothing
+--           g x (Just r) n (i,k) = Just (Heap x (r (i-1,k)))
 
 moves :: Nim -> [Move] -- retorna la lista de jugadas válidas del jugador actual
-moves = recNim [(0,0)] (\x r -> listaDeJugdasHeap x ++ incrementarIndices r)
+moves = foldNim [] (\x r -> listaDeJugdasHeap x ++ incrementarIndices r)
 
 listaDeJugdasHeap :: Int -> [Move]
 listaDeJugdasHeap 0 = [] 
